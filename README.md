@@ -1,21 +1,18 @@
 # sync_docs
 
-> Claude Code Skill — Auto-sync project documentation (CHANGELOG.md & README.md)
+> Claude Code Skill — Auto-sync project documentation (CHANGELOG.md & all README*.md files)
 
-`sync_docs` is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that analyzes your git commit history and workspace changes to automatically keep your `CHANGELOG.md` and `README.md` up to date.
+`sync_docs` is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that analyzes git history, workspace changes, and the current project structure to keep `CHANGELOG.md` and all `README*.md` files aligned with the actual repository state.
 
 ## Features
 
-- **Language Auto-Detection** — Automatically detects your project's documentation language (Chinese/English) and generates content to match
 - **Smart Baseline Detection** — Determines the change starting point from git tags, CHANGELOG dates, or first commit
 - **Conventional Commits Support** — Parses `feat:` / `fix:` / `refactor:` prefixes and maps them to categorized labels
-- **Breaking Change Detection** — Identifies `BREAKING CHANGE` and `!:` suffixes, highlights breaking changes
 - **gitignore Integration** — Loads and applies filter rules to exclude build artifacts, dependencies, and temp files
 - **Project Type Detection** — Supports Node.js, Python, Go, Rust, Java, C/C++, Flutter, .NET, and more
 - **Module Grouping** — Groups changes by directory structure (Components, API, Routes, etc.)
-- **Monorepo Support** — Detects monorepo structures (pnpm workspaces, lerna, nx, turbo) and groups changes by package
+- **Recursive README Scanning** — Finds and checks all `README*.md` files instead of only the root `README.md`
 - **Workspace Change Analysis** — Includes uncommitted changes (staged and unstaged) in the analysis
-- **Large Repository Optimization** — Auto-switches to summary mode for repos with 100+ commits
 - **Minimal Intervention** — Only modifies what needs to change, preserves existing style and structure
 
 ## Installation
@@ -23,13 +20,13 @@
 ### Option 1: Global Skill (recommended)
 
 ```bash
-cp SKILL.md ~/.claude/skills/sync-docs/SKILL.md
+cp SKILL.md ~/.claude/skills/sync_docs/SKILL.md
 ```
 
 ### Option 2: Project-Level Skill
 
 ```bash
-cp SKILL.md your-project/.claude/skills/sync-docs/SKILL.md
+cp SKILL.md your-project/.claude/skills/sync_docs/SKILL.md
 ```
 
 ### Option 3: Embed in CLAUDE.md
@@ -53,16 +50,13 @@ Sync project docs based on SKILL.md
 Or simply describe what you need:
 
 ```
-帮我更新 CHANGELOG 和 README
+帮我更新 CHANGELOG 和所有 README
 ```
 
 ## Workflow
 
 ```
 ┌──────────────────────────────────────────────────┐
-│  0. Environment Detection & Language Detection    │
-│     git check → language detection (CN/EN)        │
-├──────────────────────────────────────────────────┤
 │  1. Determine Baseline Version                    │
 │     git tag → CHANGELOG date → first commit       │
 ├──────────────────────────────────────────────────┤
@@ -76,16 +70,26 @@ Or simply describe what you need:
 │  4. Analyze Project Structure                    │
 │     Detect tech stack → map module groups          │
 ├──────────────────────────────────────────────────┤
+│  4.5. Scan README*.md Files                      │
+│       find all README docs → classify by scope    │
+├──────────────────────────────────────────────────┤
 │  5. Update CHANGELOG.md                          │
 │     Categorized labels + module groups + desc     │
 ├──────────────────────────────────────────────────┤
-│  6. Check & Update README.md                     │
+│  6. Check & Update README*.md                    │
 │     Read first → update only affected sections    │
 ├──────────────────────────────────────────────────┤
 │  7. Output Summary                               │
-│     Baseline info + change preview + confirmations│
+│     Baseline info + README scan + confirmations   │
 └──────────────────────────────────────────────────┘
 ```
+
+## README Handling
+
+- Root `README.md` is treated as the repository entry document and should describe purpose, prerequisites, structure, and usage.
+- Nested `README*.md` files are treated as module docs and should describe the current responsibility, key files, and usage constraints of that directory.
+- README files describe the current state only. Change history belongs in `CHANGELOG.md`.
+- The skill updates only affected sections instead of rewriting a README from scratch.
 
 ## CHANGELOG Output Format
 
@@ -172,6 +176,11 @@ All notable changes to this project will be documented in this file.
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI, Desktop, or IDE extension
 - A git repository with at least one commit
+
+## Notes
+
+- This repository uses the directory name `sync_docs`; installation examples should keep the same name.
+- The authoritative behavior lives in [SKILL.md](SKILL.md). If README and SKILL diverge, update README to match SKILL.
 
 ## License
 
